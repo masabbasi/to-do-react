@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { useState } from "react";
 import { BiMessageAdd } from "react-icons/bi";
 import { FaTrash } from "react-icons/fa";
-import { MdDone, MdDoneAll, MdOutlineUpdate } from "react-icons/md";
+import { MdDone, MdDoneAll, MdOutlineUpdate, MdCancel } from "react-icons/md";
 import { AiFillEdit } from "react-icons/ai";
 
 const Form = () => {
@@ -18,9 +18,13 @@ const Form = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-		if (inputValue.todo!==""){
+		if (inputValue.todo.trim()!==""){
     setToDo([...todo, inputValue]);
     setInputValue({
+      todo: "",
+    });
+	} else {
+		setInputValue({
       todo: "",
     });
 	}
@@ -28,14 +32,12 @@ const Form = () => {
   };
 
   const onChangeHandler = (input) => {
-    if (input.target.value.trim()) {
       setInputValue({
-        [input.target.name]: input.target.value.trim(),
+        [input.target.name]: input.target.value,
         id: todo.length,
         completed: false,
         edit: false,
       });
-    }
   };
 
   const completedHandler = (id) => {
@@ -71,12 +73,26 @@ const Form = () => {
   };
 
   const updateValueHandler = (input) => {
-    if (input.target.value.trim()!== "") {
+    if (input.target.value!=="") {
       setUpdateTodoValue({
         todo: input.target.value.trim(),
       });
     }
   };
+
+	const cancelUpdateValue = (id)=>{
+    const updateToDo = todo.map((todo) => {
+      if (todo.id === id) {
+        return {
+          ...todo,
+          edit: false,
+        };
+      }
+      return todo;
+    });
+    setToDo(updateToDo);
+    setUpdateTodoValue({ todo: "" });
+	}
 
   const updateValue = (id) => {
     console.log(updateTodoValue);
@@ -174,9 +190,17 @@ const Form = () => {
                       onClick={() => {
                         updateValue(todo.id);
                       }}
-                      className="w-7 h-7 rounded p-2 text-3xl flex justify-center items-center text-slate-100 bg-orange-400 hover:bg-orange-500 hover:text-2xl transition-all duration-300"
+                      className="w-7 h-7 rounded p-2 text-3xl flex justify-center items-center text-slate-100 mr-1 bg-orange-400 hover:bg-orange-500 hover:text-2xl transition-all duration-300"
                     >
                       <MdOutlineUpdate />
+                    </button>
+										<button
+                      onClick={() => {
+                        cancelUpdateValue(todo.id);
+                      }}
+                      className="w-7 h-7 rounded p-2 text-3xl flex justify-center items-center text-slate-100 bg-orange-400 hover:bg-orange-500 hover:text-2xl transition-all duration-300"
+                    >
+                      <MdCancel />
                     </button>
                   </>
                 ) : null}
